@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -10,6 +9,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppointmentScheduling.API", "AppointmentScheduling.API\AppointmentScheduling.API.csproj", "{65480022-312C-4CCC-B210-0E847DBB7744}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthcareManagement.Shared", "HealthcareManagement.Shared\HealthcareManagement.Shared.csproj", "{A8443628-BDF2-44A6-8A67-EBBD382ED04D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientManagement.API.Tests", "PatientManagement.API.Tests\PatientManagement.API.Tests.csproj", "{NEW-GUID-HERE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EHR.API.Tests", "EHR.API.Tests\EHR.API.Tests.csproj", "{NEW-GUID-HERE-2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppointmentScheduling.API.Tests", "AppointmentScheduling.API.Tests\AppointmentScheduling.API.Tests.csproj", "{NEW-GUID-HERE-3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +41,17 @@ Global
 		{A8443628-BDF2-44A6-8A67-EBBD382ED04D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8443628-BDF2-44A6-8A67-EBBD382ED04D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8443628-BDF2-44A6-8A67-EBBD382ED04D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{NEW-GUID-HERE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{NEW-GUID-HERE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{NEW-GUID-HERE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{NEW-GUID-HERE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{NEW-GUID-HERE-2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{NEW-GUID-HERE-2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{NEW-GUID-HERE-2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{NEW-GUID-HERE-2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{NEW-GUID-HERE-3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{NEW-GUID-HERE-3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{NEW-GUID-HERE-3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{NEW-GUID-HERE-3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

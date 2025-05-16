@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'mcr.microsoft.com/dotnet/sdk:8.0'
+            args '-u root'
+        }
+    }
     
     environment {
         DOCKER_REGISTRY = 'your-registry.com'
@@ -20,24 +25,45 @@ pipeline {
                 stage('Patient Management API') {
                     steps {
                         dir('PatientManagement.API') {
-                            sh 'dotnet build'
-                            sh 'dotnet test'
+                            sh 'dotnet build --verbosity detailed'
+                            script {
+                                def testProjects = sh(script: 'find . -name "*.Tests.csproj"', returnStdout: true).trim()
+                                if (testProjects) {
+                                    sh 'dotnet test --verbosity detailed --logger "console;verbosity=detailed"'
+                                } else {
+                                    echo 'No test projects found for Patient Management API'
+                                }
+                            }
                         }
                     }
                 }
                 stage('EHR API') {
                     steps {
                         dir('EHR.API') {
-                            sh 'dotnet build'
-                            sh 'dotnet test'
+                            sh 'dotnet build --verbosity detailed'
+                            script {
+                                def testProjects = sh(script: 'find . -name "*.Tests.csproj"', returnStdout: true).trim()
+                                if (testProjects) {
+                                    sh 'dotnet test --verbosity detailed --logger "console;verbosity=detailed"'
+                                } else {
+                                    echo 'No test projects found for EHR API'
+                                }
+                            }
                         }
                     }
                 }
                 stage('Appointment Scheduling API') {
                     steps {
                         dir('AppointmentScheduling.API') {
-                            sh 'dotnet build'
-                            sh 'dotnet test'
+                            sh 'dotnet build --verbosity detailed'
+                            script {
+                                def testProjects = sh(script: 'find . -name "*.Tests.csproj"', returnStdout: true).trim()
+                                if (testProjects) {
+                                    sh 'dotnet test --verbosity detailed --logger "console;verbosity=detailed"'
+                                } else {
+                                    echo 'No test projects found for Appointment Scheduling API'
+                                }
+                            }
                         }
                     }
                 }
@@ -139,6 +165,10 @@ pipeline {
         }
         failure {
             echo 'Pipeline failed!'
+            script {
+                def buildLog = currentBuild.rawBuild.getLog(1000).join('\n')
+                echo "Build Log:\n${buildLog}"
+            }
         }
     }
 } 
