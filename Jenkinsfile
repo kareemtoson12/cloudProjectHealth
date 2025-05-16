@@ -21,51 +21,21 @@ pipeline {
             }
         }
         
-        stage('Build and Test') {
-            parallel {
-                stage('Patient Management API') {
-                    steps {
-                        dir('PatientManagement.API') {
-                            sh 'dotnet build --verbosity detailed'
-                            script {
-                                def testProjects = sh(script: 'find . -name "*.Tests.csproj"', returnStdout: true).trim()
-                                if (testProjects) {
-                                    sh 'dotnet test --verbosity detailed --logger "console;verbosity=detailed"'
-                                } else {
-                                    echo 'No test projects found for Patient Management API'
-                                }
-                            }
-                        }
-                    }
-                }
-                stage('EHR API') {
-                    steps {
-                        dir('EHR.API') {
-                            sh 'dotnet build --verbosity detailed'
-                            script {
-                                def testProjects = sh(script: 'find . -name "*.Tests.csproj"', returnStdout: true).trim()
-                                if (testProjects) {
-                                    sh 'dotnet test --verbosity detailed --logger "console;verbosity=detailed"'
-                                } else {
-                                    echo 'No test projects found for EHR API'
-                                }
-                            }
-                        }
-                    }
-                }
-                stage('Appointment Scheduling API') {
-                    steps {
-                        dir('AppointmentScheduling.API') {
-                            sh 'dotnet build --verbosity detailed'
-                            script {
-                                def testProjects = sh(script: 'find . -name "*.Tests.csproj"', returnStdout: true).trim()
-                                if (testProjects) {
-                                    sh 'dotnet test --verbosity detailed --logger "console;verbosity=detailed"'
-                                } else {
-                                    echo 'No test projects found for Appointment Scheduling API'
-                                }
-                            }
-                        }
+        stage('Build Solution') {
+            steps {
+                sh 'dotnet restore'
+                sh 'dotnet build --no-restore'
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                script {
+                    def testProjects = sh(script: 'find . -name "*.Tests.csproj"', returnStdout: true).trim()
+                    if (testProjects) {
+                        sh 'dotnet test --no-build --verbosity detailed'
+                    } else {
+                        echo 'No test projects found'
                     }
                 }
             }
@@ -75,13 +45,13 @@ pipeline {
             steps {
                 script {
                     def services = [
-                        'patient-management-api',
-                        'ehr-api',
-                        'appointment-scheduling-api'
+                        'PatientManagement.API',
+                        'EHR.API',
+                        'AppointmentScheduling.API'
                     ]
                     
                     services.each { service ->
-                        def imageName = "${DOCKER_REGISTRY}/${service}:${BUILD_NUMBER}"
+                        def imageName = "${DOCKER_REGISTRY}/${service.toLowerCase()}:${BUILD_NUMBER}"
                         sh "docker build -t ${imageName} -f ${service}/Dockerfile ."
                     }
                 }
@@ -92,13 +62,13 @@ pipeline {
             steps {
                 script {
                     def services = [
-                        'patient-management-api',
-                        'ehr-api',
-                        'appointment-scheduling-api'
+                        'PatientManagement.API',
+                        'EHR.API',
+                        'AppointmentScheduling.API'
                     ]
                     
                     services.each { service ->
-                        def imageName = "${DOCKER_REGISTRY}/${service}:${BUILD_NUMBER}"
+                        def imageName = "${DOCKER_REGISTRY}/${service.toLowerCase()}:${BUILD_NUMBER}"
                         sh "trivy image ${imageName}"
                     }
                 }
@@ -114,16 +84,16 @@ pipeline {
                     
                     script {
                         def services = [
-                            'patient-management-api',
-                            'ehr-api',
-                            'appointment-scheduling-api'
+                            'PatientManagement.API',
+                            'EHR.API',
+                            'AppointmentScheduling.API'
                         ]
                         
                         services.each { service ->
-                            def imageName = "${DOCKER_REGISTRY}/${service}:${BUILD_NUMBER}"
+                            def imageName = "${DOCKER_REGISTRY}/${service.toLowerCase()}:${BUILD_NUMBER}"
                             sh "docker push ${imageName}"
-                            sh "docker tag ${imageName} ${DOCKER_REGISTRY}/${service}:latest"
-                            sh "docker push ${DOCKER_REGISTRY}/${service}:latest"
+                            sh "docker tag ${imageName} ${DOCKER_REGISTRY}/${service.toLowerCase()}:latest"
+                            sh "docker push ${DOCKER_REGISTRY}/${service.toLowerCase()}:latest"
                         }
                     }
                 }
