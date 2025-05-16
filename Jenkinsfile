@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:8.0'
-            args '-u root'
-        }
-    }
+    agent any
     
     environment {
         DOCKER_REGISTRY = 'your-registry.com'
