@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_REGISTRY = 'your-registry.com'
+        DOCKER_REGISTRY = 'docker.io'
         DOCKER_CREDENTIALS_ID = 'docker-registry-credentials'
         KUBE_CONFIG_ID = 'kubeconfig-credentials'
         GIT_CREDENTIALS_ID = 'git-credentials'
@@ -11,7 +11,13 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                checkout([$class: 'GitSCM', 
+                    branches: [[name: '*/master']], 
+                    userRemoteConfigs: [[
+                        credentialsId: "${GIT_CREDENTIALS_ID}",
+                        url: 'https://github.com/kareemtoson12/cloudProjectHealth.git'
+                    ]]
+                ])
             }
         }
         
