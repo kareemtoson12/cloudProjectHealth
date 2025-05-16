@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  healthcare-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    image: healthcare-app:dev
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=healthcare-db;Database=HealthcareDB;User Id=sa;Password=${DB_PASSWORD}
+    depends_on:
+      - healthcare-db
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - healthcare-network
+
+  patient-management-api:
+    build:
+      context: ./PatientManagement
+      dockerfile: Dockerfile
+      target: development
+    image: patient-management-api:dev
+    ports:
+      - "8081:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=patient-db;Database=PatientDB;User Id=sa;Password=${DB_PASSWORD}
+    depends_on:
+      - patient-db
+    volumes:
+      - ./PatientManagement:/app
+    networks:
+      - healthcare-network
+
+  ehr-api:
+    build:
+      context: ./EHR
+      dockerfile: Dockerfile
+      target: development
+    image: ehr-api:dev
+    ports:
+      - "8082:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=ehr-db;Database=EHRDB;User Id=sa;Password=${DB_PASSWORD}
+    depends_on:
+      - ehr-db
+    volumes:
+      - ./EHR:/app
+    networks:
+      - healthcare-network
+
+  appointment-scheduling-api:
+    build:
+      context: ./AppointmentScheduling
+      dockerfile: Dockerfile
+      target: development
+    image: appointment-scheduling-api:dev
+    ports:
+      - "8083:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=appointment-db;Database=AppointmentDB;User Id=sa;Password=${DB_PASSWORD}
+    depends_on:
+      - appointment-db
+    volumes:
+      - ./AppointmentScheduling:/app
+    networks:
+      - healthcare-network
+
+  healthcare-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - healthcare-db-data:/var/opt/mssql
+    networks:
+      - healthcare-network
+
+  patient-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "1434:1433"
+    volumes:
+      - patient-db-data:/var/opt/mssql
+    networks:
+      - healthcare-network
+
+  ehr-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "1435:1433"
+    volumes:
+      - ehr-db-data:/var/opt/mssql
+    networks:
+      - healthcare-network
+
+  appointment-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "1436:1433"
+    volumes:
+      - appointment-db-data:/var/opt/mssql
+    networks:
+      - healthcare-network
+
+volumes:
+  healthcare-db-data:
+  patient-db-data:
+  ehr-db-data:
+  appointment-db-data:
+
+networks:
+  healthcare-network:
+    driver: bridge 

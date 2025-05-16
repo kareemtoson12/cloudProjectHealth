@@ -1,0 +1,79 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: healthcare-prod
+
+resources:
+- ../../base
+
+patches:
+- target:
+    kind: ConfigMap
+    name: healthcare-config
+  patch: |-
+    - op: replace
+      path: /data/environment
+      value: "Production"
+    - op: replace
+      path: /data/logging__LogLevel__Default
+      value: "Warning"
+    - op: replace
+      path: /data/CORS__AllowedOrigins
+      value: "https://healthcare.example.com"
+
+- target:
+    kind: Deployment
+    name: healthcare-app
+  patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: 3
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/memory
+      value: "512Mi"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/cpu
+      value: "300m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/memory
+      value: "1Gi"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/cpu
+      value: "1000m"
+
+- target:
+    kind: HorizontalPodAutoscaler
+    name: healthcare-app-hpa
+  patch: |-
+    - op: replace
+      path: /spec/minReplicas
+      value: 3
+    - op: replace
+      path: /spec/maxReplicas
+      value: 10
+    - op: replace
+      path: /spec/metrics/0/resource/target/averageUtilization
+      value: 60
+    - op: replace
+      path: /spec/metrics/1/resource/target/averageUtilization
+      value: 70
+
+- target:
+    kind: Ingress
+    name: healthcare-ingress
+  patch: |-
+    - op: replace
+      path: /spec/rules/0/host
+      value: "healthcare.example.com"
+    - op: replace
+      path: /spec/tls/0/hosts/0
+      value: "healthcare.example.com"
+    - op: add
+      path: /metadata/annotations/nginx.ingress.kubernetes.io/proxy-body-size
+      value: "50m"
+    - op: add
+      path: /metadata/annotations/nginx.ingress.kubernetes.io/proxy-read-timeout
+      value: "300"
+    - op: add
+      path: /metadata/annotations/nginx.ingress.kubernetes.io/proxy-send-timeout
+      value: "300" 
